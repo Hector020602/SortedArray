@@ -1,149 +1,105 @@
-import java.io.*;
+import java.util.Arrays;
 
 public class SortedArray {
-    private String filename;
+    private int[] array;
+    private int numElements;
 
-    public SortedArray(String filename) throws IOException {
-        this.filename = filename;
-        File file = new File(filename);
-        if (!file.exists()) {
-            file.createNewFile();
+    public SortedArray(int size) {
+        numElements = 0;
+        array = new int[size];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = -1;
+        }
+        //Arrays.fill(array, -1);
+    }
+
+    public void put(int number) {
+        if (numElements == 0) {
+            array[0] = number;
+            numElements = 1;
+            return;
+        }
+        for(int i = numElements - 1; i >= 0; i--) {
+            if (array[i] > number) {
+                array[i + 1] = array[i];
+                array[i] = number;
+            } else {
+                array[i + 1] = number;
+                break;
+            }
+        }
+        numElements++;
+    }
+
+    public boolean isEmpty() {
+        return numElements == 0;
+    }
+
+    public boolean isFull() {
+        return numElements == array.length;
+    }
+
+    @Override
+    public String toString() {
+        String s = "";
+        boolean first = true;
+        for (int i = 0; i < numElements; i ++) {
+            if (first) {
+                first = false;
+            } else {
+                s += ", ";
+            }
+            s += array[i];
+        }
+        return s;
+    }
+
+    public boolean existsElementRecursive(int number) {
+        return binarySearch(number, 0, numElements -1);
+    }
+
+    public boolean binarySearch(int number, int minorIndex, int upperIndex) {
+        if (minorIndex > upperIndex) {
+            return false;
+        }
+        int middle = (minorIndex + upperIndex) / 2;
+        if (array[middle] == number) {
+            return true;
+        }
+        if (array[middle] > number) {
+            return binarySearch(number, minorIndex, middle - 1);
+        } else {
+            return binarySearch(number, middle + 1, upperIndex);
         }
     }
 
-    public String getFilename() {
-        return filename;
-    }
-
-    public void put(String newLine) throws IOException {
-        File file = new File(filename);
-        File temp = new File("temp.txt");
-        BufferedReader input = null;
-        PrintWriter out = null;
-
-        try {
-            input = new BufferedReader(new FileReader(file));
-            out = new PrintWriter(new FileWriter(temp));
-            String line;
-            boolean alreadyInserted = false;
-            while ((line = input.readLine()) != null) {
-                if (!alreadyInserted && line.compareTo(newLine) > 0) {
-                    out.println(newLine);
-                    alreadyInserted = true;
-                }
-                out.println(line);
+    public boolean existsElement(int number) {
+        int minorIndex = 0;
+        int upperIndex = numElements - 1;
+        int middle = (upperIndex + minorIndex) / 2;
+        while (upperIndex >= minorIndex && array[middle] != number) {
+            if (array[middle] < number) {
+                minorIndex = middle + 1;
+            } else {
+                upperIndex = middle - 1;
             }
-            if (!alreadyInserted) {
-                out.println(newLine);
-            }
-            file.delete();
-            temp.renameTo(file);
-        } finally {
-            if (input != null) {
-                input.close();
-            }
-            if (out != null) {
-                out.close();
-            }
+            middle = (upperIndex + minorIndex) / 2;
         }
-    }
-
-    public int getNumElements() throws IOException {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(filename));
-            String line;
-            int counter = 0;
-            while ((line = in.readLine()) != null) {
-                counter++;
-            }
-            return counter;
-        } finally {
-            if (in != null) {
-                in.close();
-            }
+        if (upperIndex < minorIndex) {
+            return false;
         }
+        return true;
     }
 
-    public String getElementAt(int numLine) throws IOException {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(filename));
-            String line;
-            int counter = 0;
-            while ((line = in.readLine()) != null) {
-                counter++;
-                if (counter == numLine) {
-                    return line;
-                }
-            }
-            return null;
-        } finally {
-            if (in != null) {
-                in.close();
-            }
+    public void removeElementAt(int position) {
+        if (position < 0 || position >= numElements) {
+            throw new ArrayIndexOutOfBoundsException();
         }
-    }
-
-    public void removeElementAt(int numLine) throws IOException {
-        File file = new File(filename);
-        File temp = new File("temp.txt");
-        BufferedReader in = null;
-        PrintWriter out = null;
-        try {
-            in = new BufferedReader(new FileReader(file));
-            out = new PrintWriter(new FileWriter(temp));
-            String line;
-            int counter = 0;
-            while ((line = in.readLine()) != null) {
-                counter++;
-                if (counter != numLine) {
-                    out.println(line);
-                }
-            }
-            file.delete();
-            temp.renameTo(file);
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (out != null) {
-                out.close();
-            }
+        for (int i = position; i < numElements - 1; i ++) {
+            array[i] = array[i+1];
         }
-    }
-
-    public boolean isEmpty() throws IOException {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(filename));
-            return in.readLine() == null;
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-        }
-    }
-
-    public void emptyFile() throws IOException {
-        File file = new File(filename);
-        file.delete();
-        file.createNewFile();
-    }
-
-    public void print() throws IOException {
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new FileReader(filename));
-            String line;
-            while ((line = in.readLine()) != null) {
-                System.out.println(line);
-            }
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-        }
+        array[numElements - 1] = -1;
+        numElements--;
     }
 }
 

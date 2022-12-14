@@ -1,22 +1,14 @@
 public class Main {
     public static void main(String[] args) {
-
-        SortedArray array = new SortedArray(10);
-        array.put(2);
-        array.put(7);
-        array.put(3);
-        array.put(5);
-        array.put(1);
-
-        System.out.println(array);
-        System.out.println(array.existsElementRecursive(4));
-        array.removeElementAt(4);
-        System.out.println(array);
-
-
-
-
-
-
+        SortedArray s = new SortedArray(5);
+        s.put(2);
+        s.put(7);
+        s.put(3);
+        s.put(5);
+        s.put(1);
+        System.out.println(s);
+        System.out.println(s.existsElementRecursive(4));
+        s.removeElementAt(4);
+        System.out.println(s);
     }
 }
